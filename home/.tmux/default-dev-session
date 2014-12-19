@@ -1,0 +1,13 @@
+# Default development session Configuration
+new -s Monolith -n linux-dev -c $HOME
+split-window -h -p 70 -t 0
+split-window -v -l 10 -t 0
+split-window -v -l 10 -t 0
+split-window -v -l 10 -t 1
+split-window -v -l 5 -t 1
+send-keys -t 0 'top' Enter
+send-keys -t 2 'cd ~/Desktop' Enter
+send-keys -t 3 'echo 3' Enter
+send-keys -t 1 'vim .' Enter
+send-keys -t 4 'tail -f ' Enter
+select-pane -t 1
