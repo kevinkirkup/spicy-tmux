@@ -1,0 +1,8 @@
+# Kube status information
+new-window -n terraform-dev -c ${HOME}
+split-window -h -p 70 -t 0
+split-window -v -l 15 -t 1
+
+send-keys -t 0 '${HOME}/Documents/repos/pureport/terraform-provider-pureport' Enter
+send-keys -t 1 '${HOME}/Documents/repos/pureport/terraform-provider-pureport && vim .' Enter
+send-keys -t 2 '${HOME}/Documents/repos/pureport/terraform-provider-pureport' Enter

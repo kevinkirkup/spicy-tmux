@@ -3,7 +3,7 @@ new -s Monolith -n linux-dev -c $HOME
 split-window -h -p 70 -t 0
 split-window -v -l 10 -t 0
 split-window -v -l 10 -t 0
-split-window -v -l 10 -t 1
+split-window -v -l 10 -t 0
 split-window -v -l 5 -t 1
 send-keys -t 0 'top' Enter
 send-keys -t 2 'cd ~/Desktop' Enter

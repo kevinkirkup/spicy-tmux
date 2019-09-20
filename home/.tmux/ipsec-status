@@ -1,0 +1,16 @@
+# Kube status information
+new-window -n ipsec-status -c ${HOME}/Documents/repos/pureport/ansible
+split-window -h -p 50 -t 0
+split-window -v -l 50 -t 1
+split-window -v -l 50 -t 0
+
+send-keys -t 0 'tail_topic containers_ipsec_status' Enter
+send-keys -t 1 'tail_topic containers_ipsec_status_raw' Enter
+send-keys -t 2 'tail_topic containers_trigger_events' Enter
+send-keys -t 3 'tail_topic parser_errors' Enter
+
+select-pane -t 0 -T 'containers_ipsec_status'
+select-pane -t 1 -T 'containers_ipsec_status_raw'
+select-pane -t 2 -T 'containers_trigger_events'
+select-pane -t 3 -T 'parser_errors'
+
