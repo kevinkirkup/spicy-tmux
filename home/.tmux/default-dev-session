@@ -1,3 +1,4 @@
+# vim: set filetype=tmux:
 # Default development session Configuration
 new -s Monolith -n linux-dev -c $HOME
 split-window -h -p 70 -t 0

@@ -1,2 +1,2 @@
-*-session
-local-sessions.conf
+*
+^.gitignore

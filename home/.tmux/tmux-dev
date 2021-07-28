@@ -1,8 +1,0 @@
-# Kube status information
-new-window -n ansible-dev -c ${HOME}
-split-window -h -p 50 -t 0
-split-window -v -p 50 -t 1
-
-send-keys -t 0 'cd ${HOME}/.tmux && vim .' Enter
-send-keys -t 1 'vim ${HOME}/.tmux.conf' Enter
-send-keys -t 2 'cd ${HOME}' Enter
