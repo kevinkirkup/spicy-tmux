@@ -9,6 +9,6 @@ split-window -v -l 5 -t 1
 send-keys -t 0 'top' Enter
 send-keys -t 2 'cd ~/Desktop' Enter
 send-keys -t 3 'echo 3' Enter
-send-keys -t 1 'vim .' Enter
+send-keys -t 1 'nvim .' Enter
 send-keys -t 4 'tail -f ' Enter
 select-pane -t 1

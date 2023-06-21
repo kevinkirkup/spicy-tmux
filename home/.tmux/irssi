@@ -5,5 +5,5 @@ split-window -h -p 50 -t 0
 split-window -v -p 50 -t 1
 
 send-keys -t 0 'cd ${HOME} && irssi' Enter
-send-keys -t 1 'vim ${HOME} && vim .irssirc' Enter
-send-keys -t 2 'cd ${HOME}/.irssi && vim config' Enter
+send-keys -t 1 'nvim ${HOME} && nvim .irssirc' Enter
+send-keys -t 2 'cd ${HOME}/.irssi && nvim config' Enter

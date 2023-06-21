@@ -4,6 +4,6 @@ new-window -n vim-config -c ${HOME}/.homesick/repos/spicy-vim/
 split-window -h -p 50 -t 0
 split-window -v -p 50 -t 1
 
-send-keys -t 0 'cd ${HOME}/.homesick/repos/spicy-vim/home/.vim/bundle && vim .' Enter
-send-keys -t 1 'cd ${HOME}/.homesick/repos/spicy-vim && vim .' Enter
+send-keys -t 0 'cd ${HOME}/.homesick/repos/spicy-vim/home/.vim/bundle && nvim .' Enter
+send-keys -t 1 'cd ${HOME}/.homesick/repos/spicy-vim && nvim .' Enter
 send-keys -t 2 'cd ${HOME}/.homesick/repos/spicy-vim' Enter
