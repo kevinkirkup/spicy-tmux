@@ -1,0 +1,7 @@
+# vim: set filetype=tmux:
+new -s Template -c $HOME
+
+source-file ~/.tmux/local/some-config
+kill-window -t 0
+source-file ~/.tmux/local/some-other-config
+source-file ~/.tmux/local/another-config
