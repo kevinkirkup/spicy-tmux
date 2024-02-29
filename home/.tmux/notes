@@ -1,9 +1,9 @@
 # vim: set filetype=tmux:
 # Notes
-new-window -n notes -c ${HOME}/iCloud/vaults/
-split-window -h -l 50% -t 0
-split-window -v -l 50% -t 1
+new-window -n notes -c ${HOME}/vaults/
+split-window -h -l 70% -t 0
+split-window -v -l 20% -t 1
 
-send-keys -t 0 'cd ${HOME}/iCloud/vaults' Enter
-send-keys -t 1 'cd ${HOME}/iCloud/vaults && nvim' Enter
-send-keys -t 2 'cd ${HOME}/iCloud/vaults' Enter
+send-keys -t 0 'cd ${HOME}/vaults' Enter
+send-keys -t 1 'cd ${HOME}/vaults && nvim' Enter
+send-keys -t 2 'cd ${HOME}/vaults' Enter
