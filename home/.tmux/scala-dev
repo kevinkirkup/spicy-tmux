@@ -1,0 +1,16 @@
+# vim: set filetype=tmux:
+# Scala Development
+new-window -n scala-dev -c '${HOME}/repos/me/scala-play-framework-tutorial'
+split-window -v -l 90% -t 0
+split-window -h -l 70% -t 1
+split-window -v -l 15 -t 2
+
+select-pane -t 0 -T 'Log'
+select-pane -t 0 -T 'Debug'
+select-pane -t 2 -T 'Editor'
+select-pane -t 3 -T 'Console'
+
+send-keys -t 0 '${HOME}/repos/me/scala-play-framework-tutorial && clear' Enter
+send-keys -t 1 '${HOME}/repos/me/scala-play-framework-tutorial && clear' Enter
+send-keys -t 2 '${HOME}/repos/me/scala-play-framework-tutorial && source envsetup.sh && nvim .' Enter
+send-keys -t 3 '${HOME}/repos/me/scala-play-framework-tutorial && source envsetup.sh && clear' Enter

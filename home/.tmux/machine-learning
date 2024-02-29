@@ -1,9 +1,0 @@
-# vim: set filetype=tmux:
-# Kube status information
-new-window -n machine-learning -c ${HOME}
-split-window -h -l 50% -t 0
-split-window -v -l 50% -t 1
-
-send-keys -t 0 'cd ${HOME}/.tmux && nvim .' Enter
-send-keys -t 1 'nvim ${HOME}/.tmux.conf' Enter
-send-keys -t 2 'cd ${HOME}' Enter
