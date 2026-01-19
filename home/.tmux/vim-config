@@ -1,9 +1,9 @@
 # vim: set filetype=tmux:
 # TMUX development
-new-window -n vim-config -c ${HOME}/.homesick/repos/spicy-vim/
+new-window -n vim-config -c ${HOME}/.homesick/repos/AstroNvim_config/
 split-window -h -l 50% -t 0
 split-window -v -l 50% -t 1
 
 send-keys -t 0 'cd ${HOME}/.config/nvim && nvim .' Enter
-send-keys -t 1 'cd ${HOME}/.homesick/repos/spicy-vim && nvim .' Enter
-send-keys -t 2 'cd ${HOME}/.homesick/repos/spicy-vim' Enter
+send-keys -t 1 'cd ${HOME}/.homesick/repos/AstroNvim_config && nvim .' Enter
+send-keys -t 2 'cd ${HOME}/.homesick/repos/AstroNvim_config' Enter
