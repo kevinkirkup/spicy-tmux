@@ -1,0 +1,64 @@
+# windows.yaml — machine-local window config source of truth
+# Copy to ~/.tmux/local/windows.yaml and edit for your projects.
+#
+# Each top-level key becomes both the window name and the config filename
+# written to ~/.tmux/local/<name>.
+#
+# Keys:
+#   dir      (required) — project directory; envsetup.sh is sourced automatically if present
+#   template (optional) — Jinja2 template name from ~/.tmux/templates/ (default: "default")
+#   panes    (optional) — map of pane label overrides (L0–L3); templates supply defaults
+#
+# Available templates:
+#   default    — 6 panes: top strip (L0, L1), left column (L2, L3), Editor, Console
+#   dev-4pane  — 4 panes: narrow top bar (L0), left column (L1), Editor, Console
+#   simple     — 3 panes: left pane, Editor, Console
+#   monitoring — 7 panes: top strip (L0, L1, L2), large area with Editor, Console, Working
+#   notebook   — 3 panes: left server pane (L0), Editor, Console (side-by-side)
+#
+# Run `dev-windows generate` to regenerate all config files after editing.
+# Run `dev-windows add -n <name> -d <dir>` to add a single window interactively.
+
+# --- default template (6-pane) ---
+my-project:
+  dir: ~/repos/my-project
+  panes:
+    L0: Watch
+    L1: Logs
+    L3: Tests
+
+my-project-with-l2:
+  dir: ~/repos/my-project
+  panes:
+    L0: Scheduler
+    L1: Webserver
+    L2: Tests
+
+# --- dev-4pane template ---
+my-service:
+  dir: ~/repos/my-service
+  template: dev-4pane
+  panes:
+    L0: Log
+    L1: Debug
+
+# --- simple template (3-pane) ---
+my-docs:
+  dir: ~/repos/my-docs
+  template: simple
+
+# --- monitoring template (7-pane) ---
+my-platform:
+  dir: ~/repos/my-platform
+  template: monitoring
+  panes:
+    L0: Log
+    L1: Misc
+    L2: Metrics
+
+# --- notebook template (3-pane side-by-side) ---
+my-notebooks:
+  dir: ~/repos/my-notebooks
+  template: notebook
+  panes:
+    L0: Jupyter
