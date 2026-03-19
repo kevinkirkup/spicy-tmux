@@ -1,0 +1,249 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pyyaml", "click", "jinja2"]
+# ///
+"""
+dev-windows — manage tmux development window configs
+
+Templates live in ~/.tmux/templates/*.j2 (tracked in repo).
+Machine-local templates can be added to ~/.tmux/local/templates/*.j2
+and will take precedence over the shared ones.
+"""
+
+import os
+import re
+from pathlib import Path
+
+import click
+import yaml
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound
+
+LOCAL_DIR       = Path(os.environ.get("TMUX_LOCAL_DIR", "~/.tmux/local")).expanduser()
+TEMPLATES_DIR   = Path("~/.tmux/templates").expanduser()
+LOCAL_TMPL_DIR  = LOCAL_DIR / "templates"
+CONFIG_FILE     = LOCAL_DIR / "windows.yaml"
+BINDINGS_FILE   = LOCAL_DIR / "bindings.conf"
+
+
+# ---------------------------------------------------------------------------
+# Template loading
+# ---------------------------------------------------------------------------
+
+def get_template(name: str):
+    """Load a Jinja2 template by name, checking local overrides first."""
+    search_path = []
+    if LOCAL_TMPL_DIR.exists():
+        search_path.append(str(LOCAL_TMPL_DIR))
+    search_path.append(str(TEMPLATES_DIR))
+
+    env = Environment(
+        loader=FileSystemLoader(search_path),
+        trim_blocks=True,
+        lstrip_blocks=True,
+        keep_trailing_newline=True,
+    )
+    try:
+        return env.get_template(f"{name}.j2")
+    except TemplateNotFound:
+        raise click.ClickException(
+            f"Template '{name}' not found. "
+            f"Add {name}.j2 to {TEMPLATES_DIR} or {LOCAL_TMPL_DIR}"
+        )
+
+
+def list_templates() -> list[str]:
+    """Return available template names from both template dirs."""
+    seen = set()
+    names = []
+    for d in (LOCAL_TMPL_DIR, TEMPLATES_DIR):
+        if d.exists():
+            for f in sorted(d.glob("*.j2")):
+                if f.stem not in seen:
+                    names.append(f.stem)
+                    seen.add(f.stem)
+    return names
+
+
+# ---------------------------------------------------------------------------
+# Config file
+# ---------------------------------------------------------------------------
+
+def load_config() -> dict:
+    if not CONFIG_FILE.exists():
+        return {}
+    with CONFIG_FILE.open() as f:
+        return yaml.safe_load(f) or {}
+
+
+def save_config(config: dict) -> None:
+    CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with CONFIG_FILE.open("w") as f:
+        yaml.dump(config, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+
+# ---------------------------------------------------------------------------
+# Tmux config generation
+# ---------------------------------------------------------------------------
+
+def get_init(directory: str) -> str:
+    d = Path(directory).expanduser()
+    if (d / "envsetup.sh").exists():
+        return f"{directory} && source envsetup.sh && clear"
+    return f"cd {directory} && clear"
+
+
+def render(name: str, entry: dict) -> str:
+    panes = entry.get("panes", {})
+    template = get_template(entry.get("template", "default"))
+    return template.render(
+        name=name,
+        dir=entry["dir"],
+        L0=panes.get("L0", ""),
+        L1=panes.get("L1", ""),
+        L2=panes.get("L2", ""),
+        L3=panes.get("L3", ""),
+        init=get_init(entry["dir"]),
+    )
+
+
+def write_window(name: str, entry: dict) -> None:
+    path = LOCAL_DIR / name
+    path.write_text(render(name, entry))
+    click.echo(f"  written:  {path}")
+
+
+def delete_window(name: str) -> None:
+    path = LOCAL_DIR / name
+    if path.exists():
+        path.unlink()
+        click.echo(f"  deleted:  {path}")
+
+
+# ---------------------------------------------------------------------------
+# bindings.conf management
+# ---------------------------------------------------------------------------
+
+def add_binding(name: str) -> None:
+    if not BINDINGS_FILE.exists():
+        return
+
+    text = BINDINGS_FILE.read_text()
+    pattern = rf"set -s command-alias\[(\d+)\] {re.escape(name)}=.*"
+    existing = re.search(pattern, text)
+
+    if existing:
+        idx = existing.group(1)
+        replacement = f"set -s command-alias[{idx}] {name}='source-file ~/.tmux/local/{name}'"
+        BINDINGS_FILE.write_text(re.sub(pattern, replacement, text))
+        click.echo(f"  updated:  binding [{idx}] {name}")
+    else:
+        indices = [int(m) for m in re.findall(r"command-alias\[(\d+)\]", text)]
+        idx = (max(indices) + 1) if indices else 100
+        new_line = f"set -s command-alias[{idx}] {name}='source-file ~/.tmux/local/{name}'"
+        BINDINGS_FILE.write_text(text.rstrip("\n") + "\n" + new_line + "\n")
+        click.echo(f"  added:    binding [{idx}] {name}")
+
+
+def remove_binding(name: str) -> None:
+    if not BINDINGS_FILE.exists():
+        return
+
+    text = BINDINGS_FILE.read_text()
+    pattern = rf"set -s command-alias\[\d+\] {re.escape(name)}=.*\n?"
+    if re.search(pattern, text):
+        BINDINGS_FILE.write_text(re.sub(pattern, "", text))
+        click.echo(f"  removed:  binding {name}")
+    else:
+        click.echo(f"  warning:  binding '{name}' not found in bindings.conf", err=True)
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+@click.group()
+def cli():
+    """Manage tmux development window configs."""
+
+
+@cli.command()
+def generate():
+    """Regenerate all config files from windows.yaml."""
+    config = load_config()
+    if not config:
+        raise click.ClickException(f"No windows configured. Add entries to {CONFIG_FILE}")
+    click.echo(f"Generating {len(config)} window config(s)...")
+    for name, entry in config.items():
+        write_window(name, entry)
+        add_binding(name)
+
+
+@cli.command()
+@click.option("-n", "name",      required=True, help="Window name")
+@click.option("-d", "directory", required=True, help="Project directory")
+@click.option("-t", "template",  default="default", show_default=True, help="Template name")
+@click.option("--l0", default=None, metavar="label", help="Pane 0 top-left   (default: Watch)")
+@click.option("--l1", default=None, metavar="label", help="Pane 1 top-right  (default: Logs)")
+@click.option("--l2", default=None, metavar="label", help="Pane 2 left-upper (optional)")
+@click.option("--l3", default=None, metavar="label", help="Pane 3 left-lower (default: Tests)")
+def add(name, directory, template, l0, l1, l2, l3):
+    """Add or update a window in windows.yaml."""
+    config = load_config()
+    panes = {k: v for k, v in {"L0": l0, "L1": l1, "L2": l2, "L3": l3}.items() if v is not None}
+    entry = {
+        "dir": directory,
+        "template": template,
+        **({"panes": panes} if panes else {}),
+    }
+    verb = "Updated" if name in config else "Added"
+    config[name] = entry
+    save_config(config)
+    click.echo(f"{verb} '{name}' in {CONFIG_FILE}")
+    write_window(name, entry)
+    add_binding(name)
+
+
+@cli.command()
+@click.argument("name")
+def remove(name):
+    """Remove a window config, its file, and its binding."""
+    config = load_config()
+    if name not in config:
+        raise click.ClickException(f"'{name}' not found in {CONFIG_FILE}")
+    del config[name]
+    save_config(config)
+    click.echo(f"Removed '{name}' from {CONFIG_FILE}")
+    delete_window(name)
+    remove_binding(name)
+
+
+@cli.command(name="list")
+def list_windows():
+    """List all configured windows."""
+    config = load_config()
+    if not config:
+        click.echo(f"No windows configured. Edit {CONFIG_FILE}")
+        return
+    for name, entry in config.items():
+        panes = entry.get("panes", {})
+        tmpl = entry.get("template", "default")
+        labels = "  ".join(f"{k}={v}" for k, v in panes.items())
+        click.echo(f"  {name:<32} {entry['dir']}  [{tmpl}]")
+        if labels:
+            click.echo(f"  {'':32} {labels}")
+
+
+@cli.command()
+def templates():
+    """List available templates."""
+    names = list_templates()
+    if not names:
+        click.echo("No templates found.")
+        return
+    for name in names:
+        click.echo(f"  {name}")
+
+
+if __name__ == "__main__":
+    cli()

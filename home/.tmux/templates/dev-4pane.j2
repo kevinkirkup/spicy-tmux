@@ -1,0 +1,16 @@
+# vim: set filetype=tmux:
+# Managed by dev-windows — edit ~/.tmux/local/windows.yaml to update
+new-window -n {{ name }} -c '{{ dir }}'
+split-window -v -l 90% -t 0
+split-window -h -l 70% -t 1
+split-window -v -l 15 -t 2
+
+select-pane -t 0 -T '{{ L0 or "Log" }}'
+select-pane -t 1 -T '{{ L1 or "Debug" }}'
+select-pane -t 2 -T 'Editor'
+select-pane -t 3 -T 'Console'
+
+send-keys -t 0 '{{ init }}' Enter
+send-keys -t 1 '{{ init }}' Enter
+send-keys -t 2 '{{ init }} && nvim .' Enter
+send-keys -t 3 '{{ init }}' Enter
