@@ -7,12 +7,12 @@ split-window -h -l 70% -t 2
 split-window -v -l 15 -t 3
 split-window -v -l 80 -t 2
 
-select-pane -t 0 -T '{{ L0 or "Log" }}'
-select-pane -t 1 -T '{{ L1 or "Misc" }}'
-select-pane -t 2 -T '{{ L2 or "Monitoring" }}'
-select-pane -t 4 -T 'Editor'
-select-pane -t 5 -T 'Console'
-select-pane -t 6 -T 'Working'
+set-option -p -t .0 @pane_label '{{ L0 or "Log" }}'
+set-option -p -t .1 @pane_label '{{ L1 or "Misc" }}'
+set-option -p -t .2 @pane_label '{{ L2 or "Monitoring" }}'
+set-option -p -t .4 @pane_label 'Editor'
+set-option -p -t .5 @pane_label 'Console'
+set-option -p -t .6 @pane_label 'Working'
 
 send-keys -t 0 '{{ init }}' Enter
 send-keys -t 1 '{{ init }}' Enter

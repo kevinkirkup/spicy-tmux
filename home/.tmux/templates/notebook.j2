@@ -4,9 +4,9 @@ new-window -n {{ name }} -c '{{ dir }}'
 split-window -h -l 50% -t 0
 split-window -v -l 50% -t 1
 
-select-pane -t 0 -T '{{ L0 or "Server" }}'
-select-pane -t 1 -T 'Editor'
-select-pane -t 2 -T 'Console'
+set-option -p -t .0 @pane_label '{{ L0 or "Server" }}'
+set-option -p -t .1 @pane_label 'Editor'
+set-option -p -t .2 @pane_label 'Console'
 
 send-keys -t 0 '{{ init }}' Enter
 send-keys -t 1 '{{ init }} && nvim .' Enter

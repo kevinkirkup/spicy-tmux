@@ -5,10 +5,10 @@ split-window -v -l 90% -t 0
 split-window -h -l 70% -t 1
 split-window -v -l 15 -t 2
 
-select-pane -t 0 -T '{{ L0 or "Log" }}'
-select-pane -t 1 -T '{{ L1 or "Debug" }}'
-select-pane -t 2 -T 'Editor'
-select-pane -t 3 -T 'Console'
+set-option -p -t .0 @pane_label '{{ L0 or "Log" }}'
+set-option -p -t .1 @pane_label '{{ L1 or "Debug" }}'
+set-option -p -t .2 @pane_label 'Editor'
+set-option -p -t .3 @pane_label 'Console'
 
 send-keys -t 0 '{{ init }}' Enter
 send-keys -t 1 '{{ init }}' Enter
