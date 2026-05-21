@@ -1,0 +1,24 @@
+schema: spec-driven
+
+context: |
+  Tmux configuration repository managed via homesick. Files in home/ are symlinked
+  to ~ when the castle is linked. The project consists of:
+  - A main tmux.conf with global settings, Vim-style keybindings (prefix C-a),
+    Powerline status bar, and cross-platform clipboard integration.
+  - Static window/session layout scripts (no extension, tmux filetype) that define
+    split layouts and pane initialization commands.
+  - A Python CLI tool (dev-windows, run via `uv run`) that generates window configs
+    from a YAML manifest using Jinja2 templates, and manages bindings.conf aliases.
+  Commits mostly follow Conventional Commits (feat/fix/docs), with older plain messages.
+  No automated test suite. Local configs in home/.tmux/local/ are gitignored.
+
+rules:
+  proposal:
+    - Keep proposals under 500 words
+    - Always include a "Non-goals" section
+    - Distinguish between shared configs (tracked) and machine-local configs (gitignored)
+  design: []
+  tasks:
+    - Reference the homesick castle path when describing file locations
+    - Note whether changes affect shared or local (machine-specific) config
+    - For dev-windows CLI changes, specify the uv inline script dependency format
