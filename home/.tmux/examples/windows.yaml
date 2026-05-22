@@ -7,14 +7,19 @@
 # Keys:
 #   dir      (required) — project directory; envsetup.sh is sourced automatically if present
 #   template (optional) — Jinja2 template name from ~/.tmux/templates/ (default: "default")
-#   panes    (optional) — map of pane label overrides (L0–L3); templates supply defaults
+#   panes    (optional) — map of per-pane config objects keyed P0–P6
+#
+# Pane object fields (all optional):
+#   label  — display name shown in the pane title bar
+#   dir    — working directory for this pane; falls back to the window-level dir
+#   cmd    — command to run in this pane; overrides the template's default command
 #
 # Available templates:
-#   default    — 6 panes: top strip (L0, L1), left column (L2, L3), Editor, Console
-#   dev-4pane  — 4 panes: narrow top bar (L0), left column (L1), Editor, Console
-#   simple     — 3 panes: left pane, Editor, Console
-#   monitoring — 7 panes: top strip (L0, L1, L2), large area with Editor, Console, Working
-#   notebook   — 3 panes: left server pane (L0), Editor, Console (side-by-side)
+#   default    — 6 panes: top strip (P0, P1), left column (P2, P3), Editor (P4), Console (P5)
+#   dev-4pane  — 4 panes: narrow top bar (P0), left column (P1), Editor (P2), Console (P3)
+#   simple     — 3 panes: left pane (P0), Editor (P1), Console (P2)
+#   monitoring — 7 panes: top strip (P0, P1, P2), large area with Editor (P4), Console (P5), Working (P6)
+#   notebook   — 3 panes: left server pane (P0), Editor (P1), Console (P2) (side-by-side)
 #
 # Run `dev-windows generate` to regenerate all config files after editing.
 # Run `dev-windows add -n <name> -d <dir>` to add a single window interactively.
@@ -23,24 +28,39 @@
 my-project:
   dir: ~/repos/my-project
   panes:
-    L0: Watch
-    L1: Logs
-    L3: Tests
+    P0:
+      label: Watch
+    P1:
+      label: Logs
+    P3:
+      label: Tests
 
-my-project-with-l2:
-  dir: ~/repos/my-project
+# --- per-pane dir and cmd overrides ---
+my-monorepo:
+  dir: ~/repos/my-monorepo
   panes:
-    L0: Scheduler
-    L1: Webserver
-    L2: Tests
+    P0:
+      label: Watch
+      dir: ~/repos/my-monorepo/service-a
+      cmd: tail -f logs/service-a.log
+    P1:
+      label: Logs
+      dir: ~/repos/my-monorepo/service-b
+      cmd: tail -f logs/service-b.log
+    P3:
+      label: Tests
+    P4:
+      dir: ~/repos/my-monorepo/service-a
 
 # --- dev-4pane template ---
 my-service:
   dir: ~/repos/my-service
   template: dev-4pane
   panes:
-    L0: Log
-    L1: Debug
+    P0:
+      label: Log
+    P1:
+      label: Debug
 
 # --- simple template (3-pane) ---
 my-docs:
@@ -52,13 +72,18 @@ my-platform:
   dir: ~/repos/my-platform
   template: monitoring
   panes:
-    L0: Log
-    L1: Misc
-    L2: Metrics
+    P0:
+      label: Log
+    P1:
+      label: Misc
+    P2:
+      label: Metrics
 
 # --- notebook template (3-pane side-by-side) ---
 my-notebooks:
   dir: ~/repos/my-notebooks
   template: notebook
   panes:
-    L0: Jupyter
+    P0:
+      label: Jupyter
+      cmd: jupyter lab

@@ -93,17 +93,43 @@ def get_init(directory: str) -> str:
     return f"cd {directory} && clear"
 
 
+def resolve_pane_vars(entry: dict, pane_count: int = 7) -> dict:
+    """Derive per-pane dir/init/cmd variables for template rendering."""
+    window_dir = entry["dir"]
+    panes = entry.get("panes", {})
+    result = {}
+    for i in range(pane_count):
+        pane = panes.get(f"P{i}", {})
+        if isinstance(pane, str):
+            pane = {"label": pane}
+        pane_dir = pane.get("dir", window_dir)
+        result[f"dir_P{i}"] = pane_dir
+        result[f"init_P{i}"] = get_init(pane_dir)
+        result[f"cmd_P{i}"] = pane.get("cmd", "")
+    return result
+
+
+def get_pane_labels(panes: dict) -> dict:
+    """Extract L0–L3 label variables from the pane object format."""
+    labels = {}
+    for i in range(4):
+        pane = panes.get(f"P{i}", {})
+        if isinstance(pane, str):
+            labels[f"L{i}"] = pane
+        else:
+            labels[f"L{i}"] = pane.get("label", "")
+    return labels
+
+
 def render(name: str, entry: dict) -> str:
     panes = entry.get("panes", {})
     template = get_template(entry.get("template", "default"))
     return template.render(
         name=name,
         dir=entry["dir"],
-        L0=panes.get("L0", ""),
-        L1=panes.get("L1", ""),
-        L2=panes.get("L2", ""),
-        L3=panes.get("L3", ""),
         init=get_init(entry["dir"]),
+        **get_pane_labels(panes),
+        **resolve_pane_vars(entry),
     )
 
 
@@ -183,14 +209,46 @@ def generate():
 @click.option("-n", "name",      required=True, help="Window name")
 @click.option("-d", "directory", required=True, help="Project directory")
 @click.option("-t", "template",  default="default", show_default=True, help="Template name")
-@click.option("--l0", default=None, metavar="label", help="Pane 0 top-left   (default: Watch)")
-@click.option("--l1", default=None, metavar="label", help="Pane 1 top-right  (default: Logs)")
-@click.option("--l2", default=None, metavar="label", help="Pane 2 left-upper (optional)")
-@click.option("--l3", default=None, metavar="label", help="Pane 3 left-lower (default: Tests)")
-def add(name, directory, template, l0, l1, l2, l3):
+@click.option("--l0", default=None, metavar="label", help="Pane 0 label (default: Watch)")
+@click.option("--l1", default=None, metavar="label", help="Pane 1 label (default: Logs)")
+@click.option("--l2", default=None, metavar="label", help="Pane 2 label (optional)")
+@click.option("--l3", default=None, metavar="label", help="Pane 3 label (default: Tests)")
+@click.option("--p0-dir", default=None, metavar="dir", help="Pane 0 working directory")
+@click.option("--p1-dir", default=None, metavar="dir", help="Pane 1 working directory")
+@click.option("--p2-dir", default=None, metavar="dir", help="Pane 2 working directory")
+@click.option("--p3-dir", default=None, metavar="dir", help="Pane 3 working directory")
+@click.option("--p4-dir", default=None, metavar="dir", help="Pane 4 working directory")
+@click.option("--p5-dir", default=None, metavar="dir", help="Pane 5 working directory")
+@click.option("--p6-dir", default=None, metavar="dir", help="Pane 6 working directory")
+@click.option("--p0-cmd", default=None, metavar="cmd", help="Pane 0 command override")
+@click.option("--p1-cmd", default=None, metavar="cmd", help="Pane 1 command override")
+@click.option("--p2-cmd", default=None, metavar="cmd", help="Pane 2 command override")
+@click.option("--p3-cmd", default=None, metavar="cmd", help="Pane 3 command override")
+@click.option("--p4-cmd", default=None, metavar="cmd", help="Pane 4 command override")
+@click.option("--p5-cmd", default=None, metavar="cmd", help="Pane 5 command override")
+@click.option("--p6-cmd", default=None, metavar="cmd", help="Pane 6 command override")
+def add(name, directory, template, l0, l1, l2, l3,
+        p0_dir, p1_dir, p2_dir, p3_dir, p4_dir, p5_dir, p6_dir,
+        p0_cmd, p1_cmd, p2_cmd, p3_cmd, p4_cmd, p5_cmd, p6_cmd):
     """Add or update a window in windows.yaml."""
     config = load_config()
-    panes = {k: v for k, v in {"L0": l0, "L1": l1, "L2": l2, "L3": l3}.items() if v is not None}
+
+    label_vals = [l0, l1, l2, l3, None, None, None]
+    dir_vals   = [p0_dir, p1_dir, p2_dir, p3_dir, p4_dir, p5_dir, p6_dir]
+    cmd_vals   = [p0_cmd, p1_cmd, p2_cmd, p3_cmd, p4_cmd, p5_cmd, p6_cmd]
+
+    panes = {}
+    for i in range(7):
+        obj = {}
+        if i < 4 and label_vals[i] is not None:
+            obj["label"] = label_vals[i]
+        if dir_vals[i] is not None:
+            obj["dir"] = dir_vals[i]
+        if cmd_vals[i] is not None:
+            obj["cmd"] = cmd_vals[i]
+        if obj:
+            panes[f"P{i}"] = obj
+
     entry = {
         "dir": directory,
         "template": template,
@@ -228,10 +286,13 @@ def list_windows():
     for name, entry in config.items():
         panes = entry.get("panes", {})
         tmpl = entry.get("template", "default")
-        labels = "  ".join(f"{k}={v}" for k, v in panes.items())
         click.echo(f"  {name:<32} {entry['dir']}  [{tmpl}]")
-        if labels:
-            click.echo(f"  {'':32} {labels}")
+        for pk, pane in panes.items():
+            if isinstance(pane, str):
+                parts = f"label={pane}"
+            else:
+                parts = "  ".join(f"{k}={v}" for k, v in pane.items())
+            click.echo(f"  {'':32} {pk}: {parts}")
 
 
 @cli.command()

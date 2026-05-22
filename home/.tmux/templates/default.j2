@@ -14,9 +14,9 @@ set-option -p -t .1 @pane_label '{{ L1 or "Logs" }}'
 set-option -p -t .4 @pane_label 'Editor'
 set-option -p -t .5 @pane_label 'Console'
 
-send-keys -t 0 '{{ init }}' Enter
-send-keys -t 1 '{{ init }}' Enter
-send-keys -t 2 '{{ init }}' Enter
-send-keys -t 3 '{{ init }}' Enter
-send-keys -t 4 '{{ init }} && nvim .' Enter
-send-keys -t 5 '{{ init }}' Enter
+send-keys -t 0 '{% if cmd_P0 %}{{ cmd_P0 }}{% else %}{{ init_P0 }}{% endif %}' Enter
+send-keys -t 1 '{% if cmd_P1 %}{{ cmd_P1 }}{% else %}{{ init_P1 }}{% endif %}' Enter
+send-keys -t 2 '{% if cmd_P2 %}{{ cmd_P2 }}{% else %}{{ init_P2 }}{% endif %}' Enter
+send-keys -t 3 '{% if cmd_P3 %}{{ cmd_P3 }}{% else %}{{ init_P3 }}{% endif %}' Enter
+send-keys -t 4 '{% if cmd_P4 %}{{ cmd_P4 }}{% else %}{{ init_P4 }} && nvim .{% endif %}' Enter
+send-keys -t 5 '{% if cmd_P5 %}{{ cmd_P5 }}{% else %}{{ init_P5 }}{% endif %}' Enter
