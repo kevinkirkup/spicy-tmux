@@ -6,8 +6,8 @@ split-window -v -l 50% -t 1
 
 set-option -p -t .0 @pane_label '{{ L0 or "Server" }}'
 set-option -p -t .1 @pane_label 'Editor'
-set-option -p -t .2 @pane_label 'Console'
+set-option -p -t .2 @pane_label 'AI'
 
 send-keys -t 0 '{% if cmd_P0 %}cd {{ dir_P0 }} && {{ cmd_P0 }}{% else %}{{ init_P0 }}{% endif %}' Enter
 send-keys -t 1 '{% if cmd_P1 %}cd {{ dir_P1 }} && {{ cmd_P1 }}{% else %}{{ init_P1 }} && nvim .{% endif %}' Enter
-send-keys -t 2 '{% if cmd_P2 %}cd {{ dir_P2 }} && {{ cmd_P2 }}{% else %}{{ init_P2 }}{% endif %}' Enter
+send-keys -t 2 '{% if cmd_P2 %}cd {{ dir_P2 }} && {{ cmd_P2 }}{% else %}{{ init_P2 }} && claude{% endif %}' Enter

@@ -4,21 +4,19 @@ new-window -n {{ name }} -c '{{ dir }}'
 split-window -v -l 90% -t 0
 split-window -h -l 50% -t 0
 split-window -h -l 70% -t 2
-split-window -v -l 15 -t 3
+split-window -v -l 50% -t 3
 split-window -v -l 80 -t 2
 
 set-option -p -t .0 @pane_label '{{ L0 or "Log" }}'
 set-option -p -t .1 @pane_label '{{ L1 or "Misc" }}'
 set-option -p -t .2 @pane_label '{{ L2 or "Monitoring" }}'
+set-option -p -t .3 @pane_label 'Console'
 set-option -p -t .4 @pane_label 'Editor'
-set-option -p -t .5 @pane_label 'Console'
-set-option -p -t .6 @pane_label 'Working'
+set-option -p -t .5 @pane_label 'AI'
 
 send-keys -t 0 '{% if cmd_P0 %}cd {{ dir_P0 }} && {{ cmd_P0 }}{% else %}{{ init_P0 }}{% endif %}' Enter
 send-keys -t 1 '{% if cmd_P1 %}cd {{ dir_P1 }} && {{ cmd_P1 }}{% else %}{{ init_P1 }}{% endif %}' Enter
 {% if cmd_P2 %}send-keys -t 2 'cd {{ dir_P2 }} && {{ cmd_P2 }}' Enter
 {% endif %}send-keys -t 3 '{% if cmd_P3 %}cd {{ dir_P3 }} && {{ cmd_P3 }}{% else %}{{ init_P3 }}{% endif %}' Enter
 send-keys -t 4 '{% if cmd_P4 %}cd {{ dir_P4 }} && {{ cmd_P4 }}{% else %}{{ init_P4 }} && nvim .{% endif %}' Enter
-send-keys -t 5 '{% if cmd_P5 %}cd {{ dir_P5 }} && {{ cmd_P5 }}{% else %}{{ init_P5 }}{% endif %}' Enter
-{% if cmd_P6 %}send-keys -t 6 'cd {{ dir_P6 }} && {{ cmd_P6 }}' Enter
-{% endif %}
+send-keys -t 5 '{% if cmd_P5 %}cd {{ dir_P5 }} && {{ cmd_P5 }}{% else %}{{ init_P5 }} && claude{% endif %}' Enter

@@ -3,14 +3,14 @@
 new-window -n {{ name }} -c '{{ dir }}'
 split-window -v -l 90% -t 0
 split-window -h -l 70% -t 1
-split-window -v -l 15 -t 2
+split-window -v -l 50% -t 2
 
 set-option -p -t .0 @pane_label '{{ L0 or "Log" }}'
 set-option -p -t .1 @pane_label '{{ L1 or "Debug" }}'
 set-option -p -t .2 @pane_label 'Editor'
-set-option -p -t .3 @pane_label 'Console'
+set-option -p -t .3 @pane_label 'AI'
 
 send-keys -t 0 '{% if cmd_P0 %}cd {{ dir_P0 }} && {{ cmd_P0 }}{% else %}{{ init_P0 }}{% endif %}' Enter
 send-keys -t 1 '{% if cmd_P1 %}cd {{ dir_P1 }} && {{ cmd_P1 }}{% else %}{{ init_P1 }}{% endif %}' Enter
 send-keys -t 2 '{% if cmd_P2 %}cd {{ dir_P2 }} && {{ cmd_P2 }}{% else %}{{ init_P2 }} && nvim .{% endif %}' Enter
-send-keys -t 3 '{% if cmd_P3 %}cd {{ dir_P3 }} && {{ cmd_P3 }}{% else %}{{ init_P3 }}{% endif %}' Enter
+send-keys -t 3 '{% if cmd_P3 %}cd {{ dir_P3 }} && {{ cmd_P3 }}{% else %}{{ init_P3 }} && claude{% endif %}' Enter
